@@ -1,0 +1,2122 @@
+SQL> --========================== START RUN =====================================---
+SQL> -- Running rm-schema-insert.sql
+SQL> set echo off
+SQL> ------------- Task 1 Create Tables -----------------------------------------
+SQL> @T1-rm-schema.sql
+SQL> /*****PLEASE ENTER YOUR DETAILS BELOW*****/
+SQL> --T1-rm-schema.sql
+SQL> 
+SQL> --Student ID: 34280332
+SQL> --Student Name: Chee Cheng Mun
+SQL> 
+SQL> /* Comments for your marker:
+SQL>
+SQL>
+SQL>
+SQL>
+SQL>*/
+SQL> 
+SQL> /* drop table statements - do not remove*/
+SQL> 
+SQL> drop table competitor cascade constraints purge;
+
+Table COMPETITOR dropped.
+
+SQL> 
+SQL> drop table entry cascade constraints purge;
+
+Table ENTRY dropped.
+
+SQL> 
+SQL> drop table team cascade constraints purge;
+
+Table TEAM dropped.
+
+SQL> 
+SQL> /* end of drop table statements*/
+SQL> 
+SQL> -- Task 1 Add Create table statements for the Missing TABLES below.
+SQL> -- Ensure all column comments, and constraints (other than FK's)are included.
+SQL> -- FK constraints are to be added at the end of this script
+SQL> 
+SQL> -- COMPETITOR
+SQL> create table competitor (
+  2      comp_no        number(5) not null,
+  3      comp_fname     varchar2(30),
+  4      comp_lname     varchar2(30),
+  5      comp_gender    char(1) not null,
+  6      comp_dob       date not null,
+  7      comp_email     varchar2(50) not null,
+  8      comp_unistatus char(1) not null,
+  9      comp_phone     char(10) not null
+ 10  );
+
+Table COMPETITOR created.
+
+SQL> 
+SQL> comment on column competitor.comp_no is
+  2      'Unique identifier for a competitor';
+
+Comment created.
+
+SQL> 
+SQL> comment on column competitor.comp_fname is
+  2      'Competitor''s first name';
+
+Comment created.
+
+SQL> 
+SQL> comment on column competitor.comp_lname is
+  2      'Competitor''s last name';
+
+Comment created.
+
+SQL> 
+SQL> comment on column competitor.comp_gender is
+  2      'Competitor''s gender';
+
+Comment created.
+
+SQL> 
+SQL> comment on column competitor.comp_dob is
+  2      'Competitor''s date of birth';
+
+Comment created.
+
+SQL> 
+SQL> comment on column competitor.comp_email is
+  2      'Competitor''s email (unique for each competitor)';
+
+Comment created.
+
+SQL> 
+SQL> comment on column competitor.comp_unistatus is
+  2      'Competitor is a university student or staff';
+
+Comment created.
+
+SQL> 
+SQL> comment on column competitor.comp_phone is
+  2      'Competitor''s phone number (unique for each competitor)';
+
+Comment created.
+
+SQL> 
+SQL> alter table competitor add constraint competitor_pk primary key ( comp_no );
+
+Table COMPETITOR altered.
+
+SQL> 
+SQL> alter table competitor add constraint competitor_uq unique ( comp_email,
+  2                                                               comp_phone );
+
+Table COMPETITOR altered.
+
+SQL> 
+SQL> alter table competitor
+  2      add constraint ck_comp_gender
+  3          check ( comp_gender in ( 'M',
+  4                                   'F',
+  5                                   'U' ) );
+
+Table COMPETITOR altered.
+
+SQL> 
+SQL> alter table competitor
+  2      add constraint ck_comp_unistatus check ( comp_unistatus in ( 'Y',
+  3                                                                   'N' ) );
+
+Table COMPETITOR altered.
+
+SQL> 
+SQL> --ENTRY
+SQL> create table entry (
+  2      event_id          number(6) not null,
+  3      entry_no          number(5) not null,
+  4      entry_starttime   date,
+  5      entry_finishtime  date,
+  6      entry_elapsedtime date,
+  7      comp_no           number(5) not null,
+  8      team_id           number(3),
+  9      char_id           number(3)
+ 10  );
+
+Table ENTRY created.
+
+SQL> 
+SQL> comment on column entry.event_id is
+  2      'Event id (surrogate primary key)';
+
+Comment created.
+
+SQL> 
+SQL> comment on column entry.entry_no is
+  2      'Entry number (unique only within an event) ';
+
+Comment created.
+
+SQL> 
+SQL> comment on column entry.entry_starttime is
+  2      'The entrant''s start time';
+
+Comment created.
+
+SQL> 
+SQL> comment on column entry.entry_finishtime is
+  2      'The entrant''s finish time';
+
+Comment created.
+
+SQL> 
+SQL> comment on column entry.entry_elapsedtime is
+  2      'The time the entrant took to complete the event';
+
+Comment created.
+
+SQL> 
+SQL> comment on column entry.comp_no is
+  2      'Unique identifier for a competitor';
+
+Comment created.
+
+SQL> 
+SQL> comment on column entry.team_id is
+  2      'Team identifier';
+
+Comment created.
+
+SQL> 
+SQL> comment on column entry.char_id is
+  2      'Charity unique identifier';
+
+Comment created.
+
+SQL> 
+SQL> alter table entry add constraint entry_pk primary key ( event_id,
+  2                                                          entry_no );
+
+Table ENTRY altered.
+
+SQL> 
+SQL> --TEAM
+SQL> create table team (
+  2      team_id   number(3) not null,
+  3      team_name varchar2(30) not null,
+  4      carn_date date not null,
+  5      event_id  number(6) not null,
+  6      entry_no  number(5) not null
+  7  );
+
+Table TEAM created.
+
+SQL> 
+SQL> comment on column team.team_id is
+  2      'Team identifier';
+
+Comment created.
+
+SQL> 
+SQL> comment on column team.team_name is
+  2      'Team name (unique)';
+
+Comment created.
+
+SQL> 
+SQL> comment on column team.carn_date is
+  2      'Date of carnival (unique identifier)';
+
+Comment created.
+
+SQL> 
+SQL> comment on column team.event_id is
+  2      'Event id';
+
+Comment created.
+
+SQL> 
+SQL> comment on column team.entry_no is
+  2      'Entry number';
+
+Comment created.
+
+SQL> 
+SQL> alter table team add constraint team_pk primary key ( team_id );
+
+Table TEAM altered.
+
+SQL> 
+SQL> alter table team add constraint team_uq unique ( team_name,
+  2                                                   carn_date );
+
+Table TEAM altered.
+
+SQL> 
+SQL> -- Add all missing FK Constraints below here
+SQL> 
+SQL> alter table entry
+  2      add constraint event_entry_fk foreign key ( event_id )
+  3          references event ( event_id );
+
+Table ENTRY altered.
+
+SQL> 
+SQL> alter table entry
+  2      add constraint competitor_entry_fk foreign key ( comp_no )
+  3          references competitor ( comp_no );
+
+Table ENTRY altered.
+
+SQL> 
+SQL> alter table entry
+  2      add constraint team_entry_fk foreign key ( team_id )
+  3          references team ( team_id );
+
+Table ENTRY altered.
+
+SQL> 
+SQL> alter table entry
+  2      add constraint charity_entry_fk foreign key ( char_id )
+  3          references charity ( char_id );
+
+Table ENTRY altered.
+
+SQL> 
+SQL> alter table team
+  2      add constraint carnival_team_fk foreign key ( carn_date )
+  3          references carnival ( carn_date );
+
+Table TEAM altered.
+
+SQL> 
+SQL> alter table team
+  2      add constraint entry_team_fk
+  3          foreign key ( event_id,
+  4                        entry_no )
+  5              references entry ( event_id,
+  6                                 entry_no );
+
+Table TEAM altered.
+
+SQL> 
+SQL> ------------- COMPETITOR ------------------------------------------
+SQL> describe COMPETITOR
+Name           Null?    Type         
+-------------- -------- ------------ 
+COMP_NO        NOT NULL NUMBER(5)    
+COMP_FNAME              VARCHAR2(30) 
+COMP_LNAME              VARCHAR2(30) 
+COMP_GENDER    NOT NULL CHAR(1)      
+COMP_DOB       NOT NULL DATE         
+COMP_EMAIL     NOT NULL VARCHAR2(50) 
+COMP_UNISTATUS NOT NULL CHAR(1)      
+COMP_PHONE     NOT NULL CHAR(10)     
+SQL> ------------- ENTRY --------------------------------------------
+SQL> describe ENTRY
+Name              Null?    Type      
+----------------- -------- --------- 
+EVENT_ID          NOT NULL NUMBER(6) 
+ENTRY_NO          NOT NULL NUMBER(5) 
+ENTRY_STARTTIME            DATE      
+ENTRY_FINISHTIME           DATE      
+ENTRY_ELAPSEDTIME          DATE      
+COMP_NO           NOT NULL NUMBER(5) 
+TEAM_ID                    NUMBER(3) 
+CHAR_ID                    NUMBER(3) 
+SQL> ------------- TEAM --------------------------------------------
+SQL> describe TEAM
+Name      Null?    Type         
+--------- -------- ------------ 
+TEAM_ID   NOT NULL NUMBER(3)    
+TEAM_NAME NOT NULL VARCHAR2(30) 
+CARN_DATE NOT NULL DATE         
+EVENT_ID  NOT NULL NUMBER(6)    
+ENTRY_NO  NOT NULL NUMBER(5)    
+SQL> 
+SQL> ------------- Task 2 Load Student Data  -------------------------------------
+SQL> @T2-rm-insert.sql
+SQL> /*****PLEASE ENTER YOUR DETAILS BELOW*****/
+SQL> --T2-rm-insert.sql
+SQL> 
+SQL> --Student ID: 34280332
+SQL> --Student Name: Chee Cheng Mun
+SQL> 
+SQL> /* Comments for your marker:
+SQL>Table team depends on event id and entry no of table entry, while table entry depend on team id of team table.
+SQL>So, the foreign key of both of these constraints are disabled before the insertion of entry and team tables,
+SQL>and enabled after the insertion of both tables.
+SQL>Acknowledging the use of AI
+SQL>I used AI in the following ways:
+SQL>(iii) generate some other aspect of the submitted assessment.
+SQL>I used Microsoft Copilot (https://copilot.microsoft.com/) to assist me with the generation of the data
+SQL>being inserted in this task. I have manually checked that the data generated aligns with the requirement 
+SQL>of the task. 
+SQL>*/
+SQL> 
+SQL> -- Task 2 Load the COMPETITOR, ENTRY and TEAM tables with your own
+SQL> -- test data following the data requirements expressed in the brief
+SQL> 
+SQL> -- =======================================
+SQL> -- COMPETITOR
+SQL> -- =======================================
+SQL> 
+SQL> insert into competitor values ( 1,
+  2                                  'Alice',
+  3                                  'Tan',
+  4                                  'F',
+  5                                  to_date('15/MAR/1995','DD/MON/YYYY'),
+  6                                  'alice.tan@example.com',
+  7                                  'Y',
+  8                                  '0123456789' );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into competitor values ( 2,
+  2                                  'Bob',
+  3                                  'Lim',
+  4                                  'M',
+  5                                  to_date('20/JUN/1992','DD/MON/YYYY'),
+  6                                  'bob.lim@example.com',
+  7                                  'Y',
+  8                                  '0123456790' );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into competitor values ( 3,
+  2                                  'Charlie',
+  3                                  'Ng',
+  4                                  'M',
+  5                                  to_date('01/JAN/1990','DD/MON/YYYY'),
+  6                                  'charlie.ng@example.com',
+  7                                  'Y',
+  8                                  '0123456791' );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into competitor values ( 4,
+  2                                  'Diana',
+  3                                  'Lee',
+  4                                  'F',
+  5                                  to_date('12/DEC/1998','DD/MON/YYYY'),
+  6                                  'diana.lee@example.com',
+  7                                  'Y',
+  8                                  '0123456792' );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into competitor values ( 5,
+  2                                  'Ethan',
+  3                                  'Wong',
+  4                                  'M',
+  5                                  to_date('05/MAY/1997','DD/MON/YYYY'),
+  6                                  'ethan.wong@example.com',
+  7                                  'Y',
+  8                                  '0123456793' );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into competitor values ( 6,
+  2                                  'Fiona',
+  3                                  'Goh',
+  4                                  'F',
+  5                                  to_date('10/OCT/1988','DD/MON/YYYY'),
+  6                                  'fiona.goh@example.com',
+  7                                  'N',
+  8                                  '0123456794' );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into competitor values ( 7,
+  2                                  'George',
+  3                                  'Chan',
+  4                                  'M',
+  5                                  to_date('22/JUL/1985','DD/MON/YYYY'),
+  6                                  'george.chan@example.com',
+  7                                  'N',
+  8                                  '0123456795' );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into competitor values ( 8,
+  2                                  'Hannah',
+  3                                  'Teo',
+  4                                  'F',
+  5                                  to_date('08/AUG/1989','DD/MON/YYYY'),
+  6                                  'hannah.teo@example.com',
+  7                                  'N',
+  8                                  '0123456796' );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into competitor values ( 9,
+  2                                  'Ivan',
+  3                                  'Koh',
+  4                                  'M',
+  5                                  to_date('30/SEP/1991','DD/MON/YYYY'),
+  6                                  'ivan.koh@example.com',
+  7                                  'N',
+  8                                  '0123456797' );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into competitor values ( 10,
+  2                                  'Julia',
+  3                                  'Lim',
+  4                                  'F',
+  5                                  to_date('25/APR/1994','DD/MON/YYYY'),
+  6                                  'julia.lim@example.com',
+  7                                  'N',
+  8                                  '0123456798' );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into competitor values ( 11,
+  2                                  'Kevin',
+  3                                  'Liu',
+  4                                  'M',
+  5                                  to_date('03/NOV/1993','DD/MON/YYYY'),
+  6                                  'kevin.liu@example.com',
+  7                                  'Y',
+  8                                  '0123456799' );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into competitor values ( 12,
+  2                                  'Linda',
+  3                                  'Ong',
+  4                                  'F',
+  5                                  to_date('17/FEB/1996','DD/MON/YYYY'),
+  6                                  'linda.ong@example.com',
+  7                                  'Y',
+  8                                  '0123456800' );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into competitor values ( 13,
+  2                                  'Mike',
+  3                                  'Tan',
+  4                                  'M',
+  5                                  to_date('29/MAY/1987','DD/MON/YYYY'),
+  6                                  'mike.tan@example.com',
+  7                                  'N',
+  8                                  '0123456801' );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into competitor values ( 14,
+  2                                  'Nina',
+  3                                  'Lim',
+  4                                  'F',
+  5                                  to_date('21/AUG/1990','DD/MON/YYYY'),
+  6                                  'nina.lim@example.com',
+  7                                  'N',
+  8                                  '0123456802' );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into competitor values ( 15,
+  2                                  'Oscar',
+  3                                  'Ng',
+  4                                  'M',
+  5                                  to_date('14/JAN/1992','DD/MON/YYYY'),
+  6                                  'oscar.ng@example.com',
+  7                                  'Y',
+  8                                  '0123456803' );
+
+1 row inserted.
+
+SQL> 
+SQL> 
+SQL> -- =======================================
+SQL> -- ENTRY
+SQL> -- =======================================
+SQL> alter table entry disable constraint team_entry_fk;
+
+Table ENTRY altered.
+
+SQL> alter table team disable constraint entry_team_fk;
+
+Table TEAM altered.
+
+SQL> 
+SQL> insert into entry values ( 12,
+  2                             1,
+  3                             to_date('08:45:12','hh24:mi:ss'),
+  4                             to_date('09:15:47','hh24:mi:ss'),
+  5                             to_date('00:30:35','hh24:mi:ss'),
+  6                             1,
+  7                             1,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 12,
+  2                             2,
+  3                             to_date('08:45:08','hh24:mi:ss'),
+  4                             to_date('09:20:21','hh24:mi:ss'),
+  5                             to_date('00:35:13','hh24:mi:ss'),
+  6                             2,
+  7                             null,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 12,
+  2                             3,
+  3                             to_date('08:50:15','hh24:mi:ss'),
+  4                             to_date('09:30:38','hh24:mi:ss'),
+  5                             to_date('00:40:23','hh24:mi:ss'),
+  6                             3,
+  7                             1,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 12,
+  2                             4,
+  3                             to_date('08:45:03','hh24:mi:ss'),
+  4                             null,
+  5                             null,
+  6                             4,
+  7                             2,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 12,
+  2                             5,
+  3                             to_date('08:45:25','hh24:mi:ss'),
+  4                             to_date('09:10:19','hh24:mi:ss'),
+  5                             to_date('00:24:54','hh24:mi:ss'),
+  6                             5,
+  7                             2,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 13,
+  2                             1,
+  3                             to_date('08:30:18','hh24:mi:ss'),
+  4                             to_date('08:55:33','hh24:mi:ss'),
+  5                             to_date('00:25:15','hh24:mi:ss'),
+  6                             1,
+  7                             null,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 13,
+  2                             2,
+  3                             to_date('08:35:07','hh24:mi:ss'),
+  4                             to_date('09:10:42','hh24:mi:ss'),
+  5                             to_date('00:35:35','hh24:mi:ss'),
+  6                             6,
+  7                             null,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 13,
+  2                             3,
+  3                             to_date('08:30:00','hh24:mi:ss'),
+  4                             to_date('09:09:52','hh24:mi:ss'),
+  5                             to_date('00:39:52','hh24:mi:ss'),
+  6                             7,
+  7                             null,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 13,
+  2                             4,
+  3                             to_date('08:35:00','hh24:mi:ss'),
+  4                             to_date('09:15:17','hh24:mi:ss'),
+  5                             to_date('00:40:17','hh24:mi:ss'),
+  6                             8,
+  7                             3,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 13,
+  2                             5,
+  3                             to_date('08:40:00','hh24:mi:ss'),
+  4                             null,
+  5                             null,
+  6                             9,
+  7                             null,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 2,
+  2                             1,
+  3                             to_date('08:30:00','hh24:mi:ss'),
+  4                             to_date('09:00:45','hh24:mi:ss'),
+  5                             to_date('00:30:45','hh24:mi:ss'),
+  6                             10,
+  7                             3,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 2,
+  2                             2,
+  3                             to_date('08:35:08','hh24:mi:ss'),
+  4                             to_date('09:10:31','hh24:mi:ss'),
+  5                             to_date('00:35:23','hh24:mi:ss'),
+  6                             11,
+  7                             null,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 2,
+  2                             3,
+  3                             to_date('08:40:25','hh24:mi:ss'),
+  4                             to_date('09:20:13','hh24:mi:ss'),
+  5                             to_date('00:39:48','hh24:mi:ss'),
+  6                             12,
+  7                             null,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 2,
+  2                             4,
+  3                             to_date('08:44:56','hh24:mi:ss'),
+  4                             to_date('09:25:38','hh24:mi:ss'),
+  5                             to_date('00:40:42','hh24:mi:ss'),
+  6                             1,
+  7                             3,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 2,
+  2                             5,
+  3                             to_date('08:50:11','hh24:mi:ss'),
+  4                             to_date('09:15:02','hh24:mi:ss'),
+  5                             to_date('00:24:51','hh24:mi:ss'),
+  6                             2,
+  7                             null,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 2,
+  2                             6,
+  3                             to_date('08:55:17','hh24:mi:ss'),
+  4                             to_date('09:25:10','hh24:mi:ss'),
+  5                             to_date('00:29:53','hh24:mi:ss'),
+  6                             5,
+  7                             null,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 5,
+  2                             1,
+  3                             to_date('08:00:00','hh24:mi:ss'),
+  4                             to_date('08:30:17','hh24:mi:ss'),
+  5                             to_date('00:30:17','hh24:mi:ss'),
+  6                             3,
+  7                             4,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 5,
+  2                             2,
+  3                             to_date('08:05:12','hh24:mi:ss'),
+  4                             to_date('08:40:49','hh24:mi:ss'),
+  5                             to_date('00:35:37','hh24:mi:ss'),
+  6                             4,
+  7                             4,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 5,
+  2                             3,
+  3                             to_date('08:09:55','hh24:mi:ss'),
+  4                             to_date('08:50:23','hh24:mi:ss'),
+  5                             to_date('00:40:28','hh24:mi:ss'),
+  6                             5,
+  7                             null,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 5,
+  2                             4,
+  3                             to_date('08:15:07','hh24:mi:ss'),
+  4                             to_date('08:54:58','hh24:mi:ss'),
+  5                             to_date('00:39:51','hh24:mi:ss'),
+  6                             6,
+  7                             4,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 5,
+  2                             5,
+  3                             to_date('08:20:24','hh24:mi:ss'),
+  4                             to_date('08:45:32','hh24:mi:ss'),
+  5                             to_date('00:25:08','hh24:mi:ss'),
+  6                             7,
+  7                             null,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 14,
+  2                             1,
+  3                             to_date('08:00:00','hh24:mi:ss'),
+  4                             to_date('08:30:16','hh24:mi:ss'),
+  5                             to_date('00:30:16','hh24:mi:ss'),
+  6                             8,
+  7                             5,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 14,
+  2                             2,
+  3                             to_date('08:05:14','hh24:mi:ss'),
+  4                             to_date('08:40:35','hh24:mi:ss'),
+  5                             to_date('00:35:21','hh24:mi:ss'),
+  6                             9,
+  7                             5,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 14,
+  2                             3,
+  3                             to_date('08:09:52','hh24:mi:ss'),
+  4                             to_date('08:50:43','hh24:mi:ss'),
+  5                             to_date('00:40:51','hh24:mi:ss'),
+  6                             10,
+  7                             null,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 14,
+  2                             4,
+  3                             to_date('08:15:06','hh24:mi:ss'),
+  4                             to_date('08:54:59','hh24:mi:ss'),
+  5                             to_date('00:39:53','hh24:mi:ss'),
+  6                             11,
+  7                             5,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 14,
+  2                             5,
+  3                             to_date('08:20:21','hh24:mi:ss'),
+  4                             to_date('08:45:09','hh24:mi:ss'),
+  5                             to_date('00:24:48','hh24:mi:ss'),
+  6                             12,
+  7                             null,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 6,
+  2                             1,
+  3                             to_date('08:30:08','hh24:mi:ss'),
+  4                             to_date('09:15:43','hh24:mi:ss'),
+  5                             to_date('00:45:35','hh24:mi:ss'),
+  6                             1,
+  7                             1,
+  8                             1 );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 6,
+  2                             2,
+  3                             null,
+  4                             null,
+  5                             null,
+  6                             2,
+  7                             1,
+  8                             2 );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 6,
+  2                             3,
+  3                             null,
+  4                             null,
+  5                             null,
+  6                             3,
+  7                             1,
+  8                             3 );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 6,
+  2                             4,
+  3                             to_date('08:30:15','hh24:mi:ss'),
+  4                             to_date('09:05:27','hh24:mi:ss'),
+  5                             to_date('00:35:12','hh24:mi:ss'),
+  6                             4,
+  7                             1,
+  8                             1 );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 6,
+  2                             5,
+  3                             to_date('08:30:22','hh24:mi:ss'),
+  4                             to_date('09:20:18','hh24:mi:ss'),
+  5                             to_date('00:49:56','hh24:mi:ss'),
+  6                             5,
+  7                             2,
+  8                             2 );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 6,
+  2                             6,
+  3                             to_date('08:30:11','hh24:mi:ss'),
+  4                             to_date('09:15:39','hh24:mi:ss'),
+  5                             to_date('00:45:28','hh24:mi:ss'),
+  6                             6,
+  7                             2,
+  8                             3 );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 5,
+  2                             6,
+  3                             to_date('08:00:26','hh24:mi:ss'),
+  4                             to_date('08:50:41','hh24:mi:ss'),
+  5                             to_date('00:50:15','hh24:mi:ss'),
+  6                             3,
+  7                             1,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 6,
+  2                             7,
+  3                             to_date('08:35:14','hh24:mi:ss'),
+  4                             to_date('09:30:37','hh24:mi:ss'),
+  5                             to_date('00:55:23','hh24:mi:ss'),
+  6                             5,
+  7                             2,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 12,
+  2                             8,
+  3                             to_date('08:45:31','hh24:mi:ss'),
+  4                             to_date('09:25:52','hh24:mi:ss'),
+  5                             to_date('00:40:21','hh24:mi:ss'),
+  6                             6,
+  7                             2,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into entry values ( 11,
+  2                             1,
+  3                             to_date('07:45:31','hh24:mi:ss'),
+  4                             to_date('10:45:52','hh24:mi:ss'),
+  5                             to_date('03:00:21','hh24:mi:ss'),
+  6                             13,
+  7                             null,
+  8                             null );
+
+1 row inserted.
+
+SQL> 
+SQL> 
+SQL> -- =======================================
+SQL> -- TEAM
+SQL> -- =======================================
+SQL> 
+SQL> insert into team values ( 1,
+  2                            'Coyotes',
+  3                            to_date('22/SEP/2024','DD/MON/YYYY'),
+  4                            12,
+  5                            1 );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into team values ( 2,
+  2                            'Wolves',
+  3                            to_date('22/SEP/2024','DD/MON/YYYY'),
+  4                            12,
+  5                            4 );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into team values ( 3,
+  2                            'Coyotes',
+  3                            to_date('05/OCT/2024','DD/MON/YYYY'),
+  4                            13,
+  5                            4 );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into team values ( 4,
+  2                            'Falcons',
+  3                            to_date('05/OCT/2024','DD/MON/YYYY'),
+  4                            13,
+  5                            1 );
+
+1 row inserted.
+
+SQL> 
+SQL> insert into team values ( 5,
+  2                            'Phoenix',
+  3                            to_date('05/OCT/2024','DD/MON/YYYY'),
+  4                            14,
+  5                            1 );
+
+1 row inserted.
+
+SQL> 
+SQL> alter table team enable constraint entry_team_fk;
+
+Table TEAM altered.
+
+SQL> alter table entry enable constraint team_entry_fk;
+
+Table ENTRY altered.
+
+SQL> 
+SQL> commit;
+
+Commit complete.
+
+SQL> 
+SQL> ---------------------- Task 3 DML -----------------------------------------
+SQL> @T3-rm-dm.sql
+SQL> --****PLEASE ENTER YOUR DETAILS BELOW****
+SQL> --T3-rm-dm.sql
+SQL> 
+SQL> --Student ID: 34280332
+SQL> --Student Name: Chee Cheng Mun
+SQL> 
+SQL> /* Comments for your marker:
+SQL>To acquire needed information to add the two new competitors, I make use of select statements with where clause.
+SQL>As Jackson downgraded his run, he no longer participates in the team's event, thus he is removed from the team.
+SQL>To remove the entry of Keith, the team id in his entry shall be removed so that the team can be disbanded, avoiding
+SQL>the fk constraint of team and entry.
+SQL>*/
+SQL> 
+SQL> --(a)
+SQL> drop sequence competitor_seq;
+
+Sequence COMPETITOR_SEQ dropped.
+
+SQL> drop sequence team_seq;
+
+Sequence TEAM_SEQ dropped.
+
+SQL> create sequence competitor_seq start with 100 increment by 5;
+
+Sequence COMPETITOR_SEQ created.
+
+SQL> create sequence team_seq start with 100 increment by 5;
+
+Sequence TEAM_SEQ created.
+
+SQL> 
+SQL> 
+SQL> --(b)
+SQL> insert into competitor values ( competitor_seq.nextval,
+  2                                  'Keith',
+  3                                  'Rose',
+  4                                  'M',
+  5                                  to_date('03/FEB/2004','DD/MON/YYYY'),
+  6                                  'keith.rose@example.com',
+  7                                  'Y',
+  8                                  '0422141112' );
+
+1 row inserted.
+
+SQL> commit;
+
+Commit complete.
+
+SQL> 
+SQL> alter table entry disable constraint team_entry_fk;
+
+Table ENTRY altered.
+
+SQL> alter table team disable constraint entry_team_fk;
+
+Table TEAM altered.
+
+SQL> 
+SQL> insert into team values ( team_seq.nextval,
+  2                            'Super Runners',
+  3                            (
+  4                                select carn_date
+  5                                  from carnival
+  6                                 where upper(carn_name) = 'RM WINTER SERIES CAULFIELD 2025'
+  7                            ),
+  8                            (
+  9                                select event_id
+ 10                                  from event
+ 11                                 where to_char(
+ 12                                        carn_date,
+ 13                                        'DD/MON/YYYY'
+ 14                                    ) = to_char(
+ 15                                        (
+ 16                                            select carn_date
+ 17                                              from carnival
+ 18                                             where upper(carn_name) = 'RM WINTER SERIES CAULFIELD 2025'
+ 19                                        ),
+ 20                                        'DD/MON/YYYY'
+ 21                                    )
+ 22                                   and eventtype_code = (
+ 23                                    select eventtype_code
+ 24                                      from eventtype
+ 25                                     where lower(eventtype_desc) = '10 km run'
+ 26                                )
+ 27                            ),
+ 28                            (
+ 29                                select max(entry_no) + 1
+ 30                                  from entry
+ 31                                 where event_id = (
+ 32                                    select event_id
+ 33                                      from event
+ 34                                     where to_char(
+ 35                                            carn_date,
+ 36                                            'DD/MON/YYYY'
+ 37                                        ) = to_char(
+ 38                                            (
+ 39                                                select carn_date
+ 40                                                  from carnival
+ 41                                                 where upper(carn_name) = 'RM WINTER SERIES CAULFIELD 2025'
+ 42                                            ),
+ 43                                            'DD/MON/YYYY'
+ 44                                        )
+ 45                                       and eventtype_code = (
+ 46                                        select eventtype_code
+ 47                                          from eventtype
+ 48                                         where lower(eventtype_desc) = '10 km run'
+ 49                                    )
+ 50                                )
+ 51                            ) );
+
+1 row inserted.
+
+SQL> commit;
+
+Commit complete.
+
+SQL> 
+SQL> 
+SQL> insert into entry values ( (
+  2      select event_id
+  3        from event
+  4       where to_char(
+  5              carn_date,
+  6              'DD/MON/YYYY'
+  7          ) = to_char(
+  8              (
+  9                  select carn_date
+ 10                    from carnival
+ 11                   where upper(carn_name) = 'RM WINTER SERIES CAULFIELD 2025'
+ 12              ),
+ 13              'DD/MON/YYYY'
+ 14          )
+ 15         and eventtype_code = (
+ 16          select eventtype_code
+ 17            from eventtype
+ 18           where lower(eventtype_desc) = '10 km run'
+ 19      )
+ 20  ),
+ 21                             (
+ 22                                 select max(entry_no) + 1
+ 23                                   from entry
+ 24                                  where event_id = (
+ 25                                     select event_id
+ 26                                       from event
+ 27                                      where to_char(
+ 28                                             carn_date,
+ 29                                             'DD/MON/YYYY'
+ 30                                         ) = to_char(
+ 31                                             (
+ 32                                                 select carn_date
+ 33                                                   from carnival
+ 34                                                  where upper(carn_name) = 'RM WINTER SERIES CAULFIELD 2025'
+ 35                                             ),
+ 36                                             'DD/MON/YYYY'
+ 37                                         )
+ 38                                        and eventtype_code = (
+ 39                                         select eventtype_code
+ 40                                           from eventtype
+ 41                                          where lower(eventtype_desc) = '10 km run'
+ 42                                     )
+ 43                                 )
+ 44                             ),
+ 45                             null,
+ 46                             null,
+ 47                             null,
+ 48                             competitor_seq.currval,
+ 49                             team_seq.currval,
+ 50                             (
+ 51                                 select char_id
+ 52                                   from charity
+ 53                                  where upper(char_name) = upper('Salvation Army')
+ 54                             ) );
+
+1 row inserted.
+
+SQL> commit;
+
+Commit complete.
+
+SQL> 
+SQL> insert into competitor values ( competitor_seq.nextval,
+  2                                  'Jackson',
+  3                                  'Bull',
+  4                                  'M',
+  5                                  to_date('24/AUG/2004','DD/MM/YYYY'),
+  6                                  'jackson.bull@example.com',
+  7                                  'Y',
+  8                                  '0422412524' );
+
+1 row inserted.
+
+SQL> commit;
+
+Commit complete.
+
+SQL> 
+SQL> 
+SQL> insert into entry values ( (
+  2      select event_id
+  3        from event
+  4       where to_char(
+  5              carn_date,
+  6              'DD/MON/YYYY'
+  7          ) = to_char(
+  8              (
+  9                  select carn_date
+ 10                    from carnival
+ 11                   where upper(carn_name) = 'RM WINTER SERIES CAULFIELD 2025'
+ 12              ),
+ 13              'DD/MON/YYYY'
+ 14          )
+ 15         and eventtype_code = (
+ 16          select eventtype_code
+ 17            from eventtype
+ 18           where lower(eventtype_desc) = '10 km run'
+ 19      )
+ 20  ),
+ 21                             (
+ 22                                 select max(entry_no) + 1
+ 23                                   from entry
+ 24                                  where event_id = (
+ 25                                     select event_id
+ 26                                       from event
+ 27                                      where to_char(
+ 28                                             carn_date,
+ 29                                             'DD/MON/YYYY'
+ 30                                         ) = to_char(
+ 31                                             (
+ 32                                                 select carn_date
+ 33                                                   from carnival
+ 34                                                  where upper(carn_name) = 'RM WINTER SERIES CAULFIELD 2025'
+ 35                                             ),
+ 36                                             'DD/MON/YYYY'
+ 37                                         )
+ 38                                        and eventtype_code = (
+ 39                                         select eventtype_code
+ 40                                           from eventtype
+ 41                                          where lower(eventtype_desc) = '10 km run'
+ 42                                     )
+ 43                                 )
+ 44                             ),
+ 45                             null,
+ 46                             null,
+ 47                             null,
+ 48                             competitor_seq.currval,
+ 49                             team_seq.currval,
+ 50                             (
+ 51                                 select char_id
+ 52                                   from charity
+ 53                                  where upper(char_name) = 'RSPCA'
+ 54                             ) );
+
+1 row inserted.
+
+SQL> 
+SQL> alter table team enable constraint entry_team_fk;
+
+Table TEAM altered.
+
+SQL> alter table entry enable constraint team_entry_fk;
+
+Table ENTRY altered.
+
+SQL> commit;
+
+Commit complete.
+
+SQL> 
+SQL> 
+SQL> --(c)
+SQL> 
+SQL> update entry
+  2     set event_id = (
+  3      select event_id
+  4        from event
+  5       where to_char(
+  6              carn_date,
+  7              'DD/MON/YYYY'
+  8          ) = to_char(
+  9              (
+ 10                  select carn_date
+ 11                    from carnival
+ 12                   where upper(carn_name) = 'RM WINTER SERIES CAULFIELD 2025'
+ 13              ),
+ 14              'DD/MON/YYYY'
+ 15          )
+ 16         and eventtype_code = (
+ 17          select eventtype_code
+ 18            from eventtype
+ 19           where lower(eventtype_desc) = '5 km run'
+ 20      )
+ 21  ),
+ 22         entry_no = (
+ 23             select max(entry_no) + 1
+ 24               from entry
+ 25              where event_id = (
+ 26                 select event_id
+ 27                   from event
+ 28                  where to_char(
+ 29                         carn_date,
+ 30                         'DD/MON/YYYY'
+ 31                     ) = to_char(
+ 32                         (
+ 33                             select carn_date
+ 34                               from carnival
+ 35                              where upper(carn_name) = 'RM WINTER SERIES CAULFIELD 2025'
+ 36                         ),
+ 37                         'DD/MON/YYYY'
+ 38                     )
+ 39                    and eventtype_code = (
+ 40                     select eventtype_code
+ 41                       from eventtype
+ 42                      where lower(eventtype_desc) = '5 km run'
+ 43                 )
+ 44             )
+ 45         ),
+ 46         char_id = (
+ 47             select char_id
+ 48               from charity
+ 49              where upper(char_name) = upper('Beyond Blue')
+ 50         ),
+ 51         team_id = null
+ 52   where event_id = (
+ 53          select event_id
+ 54            from entry
+ 55           where comp_no = (
+ 56              select comp_no
+ 57                from competitor
+ 58               where upper(comp_fname) = upper('Jackson')
+ 59                 and upper(comp_lname) = upper('Bull')
+ 60          )
+ 61      )
+ 62     and entry_no = (
+ 63      select max(entry_no)
+ 64        from entry
+ 65       where event_id = (
+ 66          select event_id
+ 67            from event
+ 68           where to_char(
+ 69                  carn_date,
+ 70                  'DD/MON/YYYY'
+ 71              ) = to_char(
+ 72                  (
+ 73                      select carn_date
+ 74                        from carnival
+ 75                       where upper(carn_name) = 'RM WINTER SERIES CAULFIELD 2025'
+ 76                  ),
+ 77                  'DD/MON/YYYY'
+ 78              )
+ 79             and eventtype_code = (
+ 80              select eventtype_code
+ 81                from eventtype
+ 82               where lower(eventtype_desc) = '10 km run'
+ 83          )
+ 84      )
+ 85  );
+
+1 row updated.
+
+SQL> 
+SQL> commit;
+
+Commit complete.
+
+SQL> 
+SQL> 
+SQL> --(d)
+SQL> 
+SQL> update entry
+  2     set
+  3      team_id = null
+  4   where event_id = (
+  5          select event_id
+  6            from entry
+  7           where comp_no = (
+  8              select comp_no
+  9                from competitor
+ 10               where upper(comp_fname) = upper('Keith')
+ 11                 and upper(comp_lname) = upper('Rose')
+ 12          )
+ 13      )
+ 14     and entry_no = (
+ 15      select entry_no
+ 16        from entry
+ 17       where comp_no = (
+ 18          select comp_no
+ 19            from competitor
+ 20           where upper(comp_fname) = upper('Keith')
+ 21             and upper(comp_lname) = upper('Rose')
+ 22      )
+ 23  );
+
+1 row updated.
+
+SQL> commit;
+
+Commit complete.
+
+SQL> 
+SQL> delete from team
+  2   where team_id = (
+  3      select team_id
+  4        from team
+  5       where upper(team_name) = upper('Super Runners')
+  6  );
+
+1 row deleted.
+
+SQL> commit;
+
+Commit complete.
+
+SQL> 
+SQL> delete from entry
+  2   where event_id = (
+  3          select event_id
+  4            from entry
+  5           where comp_no = (
+  6              select comp_no
+  7                from competitor
+  8               where upper(comp_fname) = upper('Keith')
+  9                 and upper(comp_lname) = upper('Rose')
+ 10          )
+ 11      )
+ 12     and entry_no = (
+ 13      select entry_no
+ 14        from entry
+ 15       where comp_no = (
+ 16          select comp_no
+ 17            from competitor
+ 18           where upper(comp_fname) = upper('Keith')
+ 19             and upper(comp_lname) = upper('Rose')
+ 20      )
+ 21  );
+
+1 row deleted.
+
+SQL> commit;
+
+Commit complete.
+
+SQL> 
+SQL> delete from competitor
+  2   where comp_no = (
+  3      select comp_no
+  4        from competitor
+  5       where upper(comp_fname) = upper('Keith')
+  6         and upper(comp_lname) = upper('Rose')
+  7  );
+
+1 row deleted.
+
+SQL> commit;
+
+Commit complete.
+
+SQL> 
+SQL> ------------- Task 4 ALTER ------------------------------------------------
+SQL> @T4-rm-mods.sql
+SQL> --****PLEASE ENTER YOUR DETAILS BELOW****
+SQL> --T4-rm-mods.sql
+SQL> 
+SQL> --Student ID: 34280332
+SQL> --Student Name: Chee Cheng Mun
+SQL> 
+SQL> /* Comments for your marker:
+SQL>For 4a, competitors who doesn't have elapsed time are considered to have not finished an event.
+SQL>
+SQL>For 4b, I created a new table charity_percentage to record the information of the funds percentage allocated for
+SQL>different charity for competitors who contributes to more than one charity.
+SQL>
+SQL>*/
+SQL> 
+SQL> --(a)
+SQL> select *
+  2    from competitor;
+
+   COMP_NO COMP_FNAME                     COMP_LNAME                     C COMP_DOB COMP_EMAIL                                         C COMP_PHONE
+---------- ------------------------------ ------------------------------ - -------- -------------------------------------------------- - ----------
+         1 Alice                          Tan                            F 15/03/95 alice.tan@example.com                              Y 0123456789
+         2 Bob                            Lim                            M 20/06/92 bob.lim@example.com                                Y 0123456790
+         3 Charlie                        Ng                             M 01/01/90 charlie.ng@example.com                             Y 0123456791
+         4 Diana                          Lee                            F 12/12/98 diana.lee@example.com                              Y 0123456792
+         5 Ethan                          Wong                           M 05/05/97 ethan.wong@example.com                             Y 0123456793
+         6 Fiona                          Goh                            F 10/10/88 fiona.goh@example.com                              N 0123456794
+         7 George                         Chan                           M 22/07/85 george.chan@example.com                            N 0123456795
+         8 Hannah                         Teo                            F 08/08/89 hannah.teo@example.com                             N 0123456796
+         9 Ivan                           Koh                            M 30/09/91 ivan.koh@example.com                               N 0123456797
+        10 Julia                          Lim                            F 25/04/94 julia.lim@example.com                              N 0123456798
+        11 Kevin                          Liu                            M 03/11/93 kevin.liu@example.com                              Y 0123456799
+        12 Linda                          Ong                            F 17/02/96 linda.ong@example.com                              Y 0123456800
+        13 Mike                           Tan                            M 29/05/87 mike.tan@example.com                               N 0123456801
+        14 Nina                           Lim                            F 21/08/90 nina.lim@example.com                               N 0123456802
+        15 Oscar                          Ng                             M 14/01/92 oscar.ng@example.com                               Y 0123456803
+       105 Jackson                        Bull                           M 24/08/04 jackson.bull@example.com                           Y 0422412524
+
+16 rows selected. 
+
+SQL> desc competitor
+Name           Null?    Type         
+-------------- -------- ------------ 
+COMP_NO        NOT NULL NUMBER(5)    
+COMP_FNAME              VARCHAR2(30) 
+COMP_LNAME              VARCHAR2(30) 
+COMP_GENDER    NOT NULL CHAR(1)      
+COMP_DOB       NOT NULL DATE         
+COMP_EMAIL     NOT NULL VARCHAR2(50) 
+COMP_UNISTATUS NOT NULL CHAR(1)      
+COMP_PHONE     NOT NULL CHAR(10)     
+SQL> 
+SQL> alter table competitor add comp_completeev number(2);
+
+Table COMPETITOR altered.
+
+SQL> desc competitor
+Name            Null?    Type         
+--------------- -------- ------------ 
+COMP_NO         NOT NULL NUMBER(5)    
+COMP_FNAME               VARCHAR2(30) 
+COMP_LNAME               VARCHAR2(30) 
+COMP_GENDER     NOT NULL CHAR(1)      
+COMP_DOB        NOT NULL DATE         
+COMP_EMAIL      NOT NULL VARCHAR2(50) 
+COMP_UNISTATUS  NOT NULL CHAR(1)      
+COMP_PHONE      NOT NULL CHAR(10)     
+COMP_COMPLETEEV          NUMBER(2)    
+SQL> 
+SQL> comment on column competitor.comp_completeev is
+  2      'Number of completed events of the Competitor';
+
+Comment created.
+
+SQL> 
+SQL> update competitor
+  2     set
+  3      comp_completeev = (
+  4          select nvl(
+  5              count(
+  6                  case
+  7                      when
+  8                          entry_starttime is not null
+  9                          and entry_finishtime is not null
+ 10                          and entry_elapsedtime is not null
+ 11                      then
+ 12                          1
+ 13                  end
+ 14              ),
+ 15              0
+ 16          )
+ 17            from entry
+ 18           where entry.comp_no = competitor.comp_no
+ 19      );
+
+16 rows updated.
+
+SQL> select *
+  2    from competitor;
+
+   COMP_NO COMP_FNAME                     COMP_LNAME                     C COMP_DOB COMP_EMAIL                                         C COMP_PHONE COMP_COMPLETEEV
+---------- ------------------------------ ------------------------------ - -------- -------------------------------------------------- - ---------- ---------------
+         1 Alice                          Tan                            F 15/03/95 alice.tan@example.com                              Y 0123456789               4
+         2 Bob                            Lim                            M 20/06/92 bob.lim@example.com                                Y 0123456790               2
+         3 Charlie                        Ng                             M 01/01/90 charlie.ng@example.com                             Y 0123456791               3
+         4 Diana                          Lee                            F 12/12/98 diana.lee@example.com                              Y 0123456792               2
+         5 Ethan                          Wong                           M 05/05/97 ethan.wong@example.com                             Y 0123456793               5
+         6 Fiona                          Goh                            F 10/10/88 fiona.goh@example.com                              N 0123456794               4
+         7 George                         Chan                           M 22/07/85 george.chan@example.com                            N 0123456795               2
+         8 Hannah                         Teo                            F 08/08/89 hannah.teo@example.com                             N 0123456796               2
+         9 Ivan                           Koh                            M 30/09/91 ivan.koh@example.com                               N 0123456797               1
+        10 Julia                          Lim                            F 25/04/94 julia.lim@example.com                              N 0123456798               2
+        11 Kevin                          Liu                            M 03/11/93 kevin.liu@example.com                              Y 0123456799               2
+        12 Linda                          Ong                            F 17/02/96 linda.ong@example.com                              Y 0123456800               2
+        13 Mike                           Tan                            M 29/05/87 mike.tan@example.com                               N 0123456801               1
+        14 Nina                           Lim                            F 21/08/90 nina.lim@example.com                               N 0123456802               0
+        15 Oscar                          Ng                             M 14/01/92 oscar.ng@example.com                               Y 0123456803               0
+       105 Jackson                        Bull                           M 24/08/04 jackson.bull@example.com                           Y 0422412524               0
+
+16 rows selected. 
+
+SQL> 
+SQL> 
+SQL> --(b) 
+SQL> drop table charity_percentage cascade constraints purge;
+
+Table CHARITY_PERCENTAGE dropped.
+
+SQL> 
+SQL> create table charity_percentage (
+  2      comp_no       number(5) not null,
+  3      char_id       number(3) not null,
+  4      carn_date     date not null,
+  5      cp_percentage number(3) not null
+  6  );
+
+Table CHARITY_PERCENTAGE created.
+
+SQL> 
+SQL> comment on column charity_percentage.comp_no is
+  2      'Unique identifier for a competitor';
+
+Comment created.
+
+SQL> 
+SQL> comment on column charity_percentage.char_id is
+  2      'Charity unique identifier';
+
+Comment created.
+
+SQL> 
+SQL> comment on column charity_percentage.carn_date is
+  2      'Date of carnival (unique identifier)';
+
+Comment created.
+
+SQL> 
+SQL> comment on column charity_percentage.cp_percentage is
+  2      'The percentage (0 to 100) of the total funds that will go to the charity';
+
+Comment created.
+
+SQL> 
+SQL> alter table charity_percentage
+  2      add constraint pk_charity_percentage primary key ( comp_no,
+  3                                                         char_id,
+  4                                                         carn_date );
+
+Table CHARITY_PERCENTAGE altered.
+
+SQL> alter table charity_percentage
+  2      add constraint fk_cp_comp foreign key ( comp_no )
+  3          references competitor ( comp_no );
+
+Table CHARITY_PERCENTAGE altered.
+
+SQL> 
+SQL> alter table charity_percentage
+  2      add constraint fk_cp_charity foreign key ( char_id )
+  3          references charity ( char_id );
+
+Table CHARITY_PERCENTAGE altered.
+
+SQL> 
+SQL> alter table charity_percentage
+  2      add constraint fk_cp_carnival foreign key ( carn_date )
+  3          references carnival ( carn_date );
+
+Table CHARITY_PERCENTAGE altered.
+
+SQL> 
+SQL> alter table charity_percentage
+  2      add constraint ck_cp_percentage check ( cp_percentage between 0 and 100 );
+
+Table CHARITY_PERCENTAGE altered.
+
+SQL> 
+SQL> commit;
+
+Commit complete.
+
+SQL> 
+SQL> select *
+  2    from charity_percentage;
+no rows selected
+SQL> desc charity_percentage
+Name          Null?    Type      
+------------- -------- --------- 
+COMP_NO       NOT NULL NUMBER(5) 
+CHAR_ID       NOT NULL NUMBER(3) 
+CARN_DATE     NOT NULL DATE      
+CP_PERCENTAGE NOT NULL NUMBER(3) 
+SQL> 
+SQL> ------------- Task 5 SQL SELECT --------------------------------------------
+SQL> @T5-rm-select.sql
+SQL> /*****PLEASE ENTER YOUR DETAILS BELOW*****/
+SQL> --T5-rm-select.sql
+SQL> 
+SQL> --Student ID: 34280332
+SQL> --Student Name: Chee Cheng Mun
+SQL> 
+SQL> 
+SQL> /* Comments for your marker:
+SQL>The report are written on the date 6/6/2025.
+SQL>
+SQL>
+SQL>
+SQL>*/
+SQL> 
+SQL> 
+SQL> /* (a) */
+SQL> -- PLEASE PLACE REQUIRED SQL SELECT STATEMENT FOR THIS PART HERE
+SQL> -- ENSURE that your query is formatted and has a semicolon
+SQL> -- (;) at the end of this answer
+SQL> 
+SQL> select t.team_name,
+  2         to_char(
+  3             t.carn_date,
+  4             'DD-MON-YYYY'
+  5         ) as carnival_date,
+  6         leader.comp_fname
+  7         || ' '
+  8         || leader.comp_lname as teamleader,
+  9         count(e.comp_no) as team_no_members
+ 10    from team t
+ 11    join entry e
+ 12  on t.team_id = e.team_id
+ 13    join entry e_leader
+ 14  on t.event_id = e_leader.event_id
+ 15     and t.entry_no = e_leader.entry_no
+ 16    join competitor leader
+ 17  on e_leader.comp_no = leader.comp_no
+ 18   where t.team_name in (
+ 19      select team_name
+ 20        from (
+ 21          select team_name,
+ 22                 count(*) as usage_count
+ 23            from team
+ 24           group by team_name
+ 25      )
+ 26       where usage_count = (
+ 27          select max(usage_count)
+ 28            from (
+ 29              select count(*) as usage_count
+ 30                from team
+ 31               group by team_name
+ 32          )
+ 33      )
+ 34  )
+ 35     and to_char(
+ 36      t.carn_date,
+ 37      'DD/MON/YYYY'
+ 38  ) < '6/JUN/2025'
+ 39   group by t.team_id,
+ 40            t.team_name,
+ 41            t.carn_date,
+ 42            leader.comp_fname,
+ 43            leader.comp_lname
+ 44   order by t.team_name,
+ 45            t.carn_date;
+
+TEAM_NAME                      CARNIVAL_DATE        TEAMLEADER                                                    TEAM_NO_MEMBERS
+------------------------------ -------------------- ------------------------------------------------------------- ---------------
+Coyotes                        22-SEP-2024          Alice Tan                                                                   7
+Coyotes                        05-OCT-2024          Hannah Teo                                                                  3
+
+SQL> 
+SQL> 
+SQL> /* (b) */
+SQL> -- PLEASE PLACE REQUIRED SQL SELECT STATEMENT FOR THIS PART HERE
+SQL> -- ENSURE that your query is formatted and has a semicolon
+SQL> -- (;) at the end of this answer
+SQL> -- Report showing record holders for each event type
+SQL> 
+SQL> select et.eventtype_desc as "Event",
+  2         c.carn_name
+  3         || ' held '
+  4         || initcap(to_char(
+  5             c.carn_date,
+  6             'DY'
+  7         ))
+  8         || ' '
+  9         || initcap(to_char(
+ 10             c.carn_date,
+ 11             'DD-MON-YYYY'
+ 12         )) as "Carnival",
+ 13         to_char(
+ 14             e.entry_elapsedtime,
+ 15             'HH24:MI:SS'
+ 16         ) as "Current Record",
+ 17         comp.comp_no
+ 18         || ' '
+ 19         || comp.comp_fname
+ 20         || ' '
+ 21         || comp.comp_lname as "Competitor No and Name",
+ 22         to_char(
+ 23             (months_between(
+ 24                 c.carn_date,
+ 25                 comp.comp_dob
+ 26             ) / 12),
+ 27             '99'
+ 28         ) as "Age at Carnival"
+ 29    from entry e
+ 30    join event ev
+ 31  on e.event_id = ev.event_id
+ 32    join eventtype et
+ 33  on ev.eventtype_code = et.eventtype_code
+ 34    join carnival c
+ 35  on ev.carn_date = c.carn_date
+ 36    join competitor comp
+ 37  on e.comp_no = comp.comp_no
+ 38   where e.entry_elapsedtime is not null
+ 39     and e.entry_elapsedtime = (
+ 40      select min(e2.entry_elapsedtime)
+ 41        from entry e2
+ 42        join event ev2
+ 43      on e2.event_id = ev2.event_id
+ 44       where ev2.eventtype_code = ev.eventtype_code
+ 45         and e2.entry_elapsedtime is not null
+ 46  )
+ 47     and e.comp_no = (
+ 48      select min(e3.comp_no)
+ 49        from entry e3
+ 50        join event ev3
+ 51      on e3.event_id = ev3.event_id
+ 52       where ev3.eventtype_code = ev.eventtype_code
+ 53         and e3.entry_elapsedtime = (
+ 54          select min(e4.entry_elapsedtime)
+ 55            from entry e4
+ 56            join event ev4
+ 57          on e4.event_id = ev4.event_id
+ 58           where ev4.eventtype_code = ev.eventtype_code
+ 59             and e4.entry_elapsedtime is not null
+ 60      )
+ 61  )
+ 62   order by et.eventtype_desc,
+ 63            comp.comp_no;
+
+Event                                              Carnival                                                                                  Current  Competitor No and Name                                                                                 Age
+-------------------------------------------------- ----------------------------------------------------------------------------------------- -------- ------------------------------------------------------------------------------------------------------ ---
+10 Km Run                                          RM Spring Series Clayton 2024 held Sun 22-Sep-2024                                        00:24:51 2 Bob Lim                                                                                               32
+21.1 Km Half Marathon                              RM Winter Series Caulfield 2025 held Sun 29-Jun-2025                                      00:24:48 12 Linda Ong                                                                                            29
+3 Km Community Run/Walk                            RM Summer Series Caulfield 2025 held Sun 02-Feb-2025                                      00:35:12 4 Diana Lee                                                                                             26
+42.2 Km Marathon                                   RM Autumn Series Clayton 2025 held Sat 15-Mar-2025                                        03:00:21 13 Mike Tan                                                                                             38
+5 Km Run                                           RM Winter Series Caulfield 2025 held Sun 29-Jun-2025                                      00:24:54 5 Ethan Wong                                                                                            28
+
+SQL> 
+SQL> 
+SQL> /* (c) */
+SQL> -- PLEASE PLACE REQUIRED SQL SELECT STATEMENT FOR THIS PART HERE
+SQL> -- ENSURE that your query is formatted and has a semicolon
+SQL> -- (;) at the end of this answer
+SQL> -- Report showing entries and percentages for Run Monash carnivals
+SQL> 
+SQL> select ac.carn_name as "Carnival Name",
+  2         initcap(to_char(
+  3             ac.carn_date,
+  4             'DD MON YYYY'
+  5         )) as "Carnival Date",
+  6         ac.eventtype_desc as "Event Description",
+  7         case
+  8             when ee.event_entries is null then
+  9                 'Not offered'
+ 10             else
+ 11                 lpad(
+ 12                     to_char(ee.event_entries),
+ 13                     17
+ 14                 )
+ 15         end as "Number of Entries",
+ 16         case
+ 17             when ee.event_entries is null then
+ 18                 ' '
+ 19             else
+ 20                 lpad(
+ 21                     to_char(
+ 22                         ((ee.event_entries * 100.0) / ct.total_entries),
+ 23                         '999'
+ 24                     ),
+ 25                     21
+ 26                 )
+ 27         end as "% of Carnival Entries"
+ 28    from (
+ 29      select c.carn_date,
+ 30             c.carn_name,
+ 31             et.eventtype_desc
+ 32        from carnival c
+ 33       cross join eventtype et
+ 34  ) ac
+ 35    left join (
+ 36      select c.carn_date,
+ 37             c.carn_name,
+ 38             et.eventtype_desc,
+ 39             count(e.entry_no) as event_entries
+ 40        from carnival c
+ 41        join event ev
+ 42      on c.carn_date = ev.carn_date
+ 43        join eventtype et
+ 44      on ev.eventtype_code = et.eventtype_code
+ 45        join entry e
+ 46      on ev.event_id = e.event_id
+ 47       group by c.carn_date,
+ 48                c.carn_name,
+ 49                et.eventtype_desc
+ 50  ) ee
+ 51  on ac.carn_date = ee.carn_date
+ 52     and ac.carn_name = ee.carn_name
+ 53     and ac.eventtype_desc = ee.eventtype_desc
+ 54    left join (
+ 55      select c.carn_date,
+ 56             c.carn_name,
+ 57             count(e.entry_no) as total_entries
+ 58        from carnival c
+ 59        join event ev
+ 60      on c.carn_date = ev.carn_date
+ 61        join entry e
+ 62      on ev.event_id = e.event_id
+ 63       group by c.carn_date,
+ 64                c.carn_name
+ 65  ) ct
+ 66  on ac.carn_date = ct.carn_date
+ 67     and ac.carn_name = ct.carn_name
+ 68   order by ac.carn_date,
+ 69            case
+ 70                when ee.event_entries is null then
+ 71                    - 1
+ 72                else
+ 73                    ee.event_entries
+ 74            end
+ 75        desc,
+ 76            ac.eventtype_desc;
+
+Carnival Name                                      Carnival Date        Event Description                                  Number of Entries % of Carnival Entries
+-------------------------------------------------- -------------------- -------------------------------------------------- ----------------- ---------------------
+RM Spring Series Clayton 2024                      22 Sep 2024          10 Km Run                                                          6                   100
+RM Spring Series Clayton 2024                      22 Sep 2024          21.1 Km Half Marathon                              Not offered                            
+RM Spring Series Clayton 2024                      22 Sep 2024          3 Km Community Run/Walk                            Not offered                            
+RM Spring Series Clayton 2024                      22 Sep 2024          42.2 Km Marathon                                   Not offered                            
+RM Spring Series Clayton 2024                      22 Sep 2024          5 Km Run                                           Not offered                            
+RM Spring Series Caulfield 2024                    05 Oct 2024          21.1 Km Half Marathon                                              6                   100
+RM Spring Series Caulfield 2024                    05 Oct 2024          10 Km Run                                          Not offered                            
+RM Spring Series Caulfield 2024                    05 Oct 2024          3 Km Community Run/Walk                            Not offered                            
+RM Spring Series Caulfield 2024                    05 Oct 2024          42.2 Km Marathon                                   Not offered                            
+RM Spring Series Caulfield 2024                    05 Oct 2024          5 Km Run                                           Not offered                            
+RM Summer Series Caulfield 2025                    02 Feb 2025          3 Km Community Run/Walk                                            7                   100
+RM Summer Series Caulfield 2025                    02 Feb 2025          10 Km Run                                          Not offered                            
+RM Summer Series Caulfield 2025                    02 Feb 2025          21.1 Km Half Marathon                              Not offered                            
+RM Summer Series Caulfield 2025                    02 Feb 2025          42.2 Km Marathon                                   Not offered                            
+RM Summer Series Caulfield 2025                    02 Feb 2025          5 Km Run                                           Not offered                            
+RM Autumn Series Clayton 2025                      15 Mar 2025          42.2 Km Marathon                                                   1                   100
+RM Autumn Series Clayton 2025                      15 Mar 2025          10 Km Run                                          Not offered                            
+RM Autumn Series Clayton 2025                      15 Mar 2025          21.1 Km Half Marathon                              Not offered                            
+RM Autumn Series Clayton 2025                      15 Mar 2025          3 Km Community Run/Walk                            Not offered                            
+RM Autumn Series Clayton 2025                      15 Mar 2025          5 Km Run                                           Not offered                            
+RM Winter Series Caulfield 2025                    29 Jun 2025          5 Km Run                                                           7                    41
+RM Winter Series Caulfield 2025                    29 Jun 2025          10 Km Run                                                          5                    29
+RM Winter Series Caulfield 2025                    29 Jun 2025          21.1 Km Half Marathon                                              5                    29
+RM Winter Series Caulfield 2025                    29 Jun 2025          3 Km Community Run/Walk                            Not offered                            
+RM Winter Series Caulfield 2025                    29 Jun 2025          42.2 Km Marathon                                   Not offered                            
+
+25 rows selected. 
+
+SQL> 
+SQL> ------------- Task 6 MongoDB (a) --------------------------------------------
+SQL> @T6-rm-json.sql
+SQL> /*****PLEASE ENTER YOUR DETAILS BELOW*****/
+SQL> --T6-rm-json.sql
+SQL> 
+SQL> --Student ID: 34280332
+SQL> --Student Name: Chee Cheng Mun
+SQL> 
+SQL> 
+SQL> /* Comments for your marker:
+SQL>
+SQL>
+SQL>
+SQL>
+SQL>*/
+SQL> 
+SQL> 
+SQL> -- PLEASE PLACE REQUIRED SQL SELECT STATEMENT FOR THIS PART HERE
+SQL> -- ENSURE that your query is formatted and has a semicolon
+SQL> -- (;) at the end of this answer
+SQL> 
+SQL> select
+  2      json_object(
+  3          '_id' value t.team_id,
+  4                  'carn_name' value c.carn_name,
+  5                  'carn_date' value to_char(
+  6              c.carn_date,
+  7              'DD-MON-YYYY'
+  8          ),
+  9                  'team_name' value t.team_name,
+ 10                  'team_leader' value
+ 11              json_object(
+ 12                  'name' value comp_leader.comp_fname
+ 13                               || ' '
+ 14                               || comp_leader.comp_lname,
+ 15                          'phone' value comp_leader.comp_phone,
+ 16                          'email' value comp_leader.comp_email
+ 17              ),
+ 18                  'team_no_of_members' value team_counts.member_count,
+ 19                  'team_members' value json_arrayagg(
+ 20              json_object(
+ 21                  'competitor_name' value comp_member.comp_fname
+ 22                                          || ' '
+ 23                                          || comp_member.comp_lname,
+ 24                          'competitor_phone' value comp_member.comp_phone,
+ 25                          'event_type' value et.eventtype_desc,
+ 26                          'entry_no' value e_member.entry_no,
+ 27                          'starttime' value nvl(
+ 28                      to_char(
+ 29                          e_member.entry_starttime,
+ 30                          'HH24:MI:SS'
+ 31                      ),
+ 32                      '-'
+ 33                  ),
+ 34                          'finishtime' value nvl(
+ 35                      to_char(
+ 36                          e_member.entry_finishtime,
+ 37                          'HH24:MI:SS'
+ 38                      ),
+ 39                      '-'
+ 40                  ),
+ 41                          'elapsedtime' value nvl(
+ 42                      to_char(
+ 43                          e_member.entry_elapsedtime,
+ 44                          'HH24:MI:SS'
+ 45                      ),
+ 46                      '-'
+ 47                  )
+ 48              )
+ 49          )
+ 50      format json)
+ 51      || ','
+ 52    from team t
+ 53    join carnival c
+ 54  on t.carn_date = c.carn_date
+ 55    join entry e_leader
+ 56  on t.event_id = e_leader.event_id
+ 57     and t.entry_no = e_leader.entry_no
+ 58    join competitor comp_leader
+ 59  on e_leader.comp_no = comp_leader.comp_no
+ 60    join entry e_member
+ 61  on t.team_id = e_member.team_id
+ 62    join competitor comp_member
+ 63  on e_member.comp_no = comp_member.comp_no
+ 64    join event ev
+ 65  on e_member.event_id = ev.event_id
+ 66    join eventtype et
+ 67  on ev.eventtype_code = et.eventtype_code
+ 68    join (
+ 69      select team_id,
+ 70             count(*) as member_count
+ 71        from entry
+ 72       where team_id is not null
+ 73       group by team_id
+ 74  ) team_counts
+ 75  on t.team_id = team_counts.team_id
+ 76   group by t.team_id,
+ 77            c.carn_name,
+ 78            c.carn_date,
+ 79            t.team_name,
+ 80            comp_leader.comp_fname,
+ 81            comp_leader.comp_lname,
+ 82            comp_leader.comp_phone,
+ 83            comp_leader.comp_email,
+ 84            team_counts.member_count
+ 85   order by t.team_id;
+
+JSON_OBJECT('_ID'VALUET.TEAM_ID,'CARN_NAME'VALUEC.CARN_NAME,'CARN_DATE'VALUETO_CHAR(C.CARN_DATE,'DD-MON-YYYY'),'TEAM_NAME'VALUET.TEAM_NAME,'TEAM_LEADER'VALUEJSON_OBJECT('NAME'VALUECOMP_LEADER.COMP_FNAME||''||COMP_LEADER.COMP_LNAME,'PHONE'VALUECOMP_LEA                                                                                                                                                                                                                                                                                                                                                             
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+{"_id":1,"carn_name":"RM Spring Series Clayton 2024","carn_date":"22-SEP-2024","team_name":"Coyotes","team_leader":{"name":"Alice Tan","phone":"0123456789","email":"alice.tan@example.com"},"team_no_of_members":7,"team_members":[{"competitor_name":"Alice Tan","competitor_phone":"0123456789","event_type":"5 Km Run","entry_no":1,"starttime":"08:45:12","finishtime":"09:15:47","elapsedtime":"00:30:35"},{"competitor_name":"Charlie Ng","competitor_phone":"0123456791","event_type":"21.1 Km Half Marathon","entry_no":6,"starttime":"08:00:26","finishtime":"08:50:41","elapsedtime":"00:50:15"},{"competitor
+_name":"Diana Lee","competitor_phone":"0123456792","event_type":"3 Km Community Run/Walk","entry_no":4,"starttime":"08:30:15","finishtime":"09:05:27","elapsedtime":"00:35:12"},{"competitor_name":"Charlie Ng","competitor_phone":"0123456791","event_type":"3 Km Community Run/Walk","entry_no":3,"starttime":"-","finishtime":"-","elapsedtime":"-"},{"competitor_name":"Bob Lim","competitor_phone":"0123456790","event_type":"3 Km Community Run/Walk","entry_no":2,"starttime":"-","finishtime":"-","elapsedtime":"-"},{"competitor_name":"Alice Tan","competitor_phone":"0123456789","event_type":"3 Km Community
+ Run/Walk","entry_no":1,"starttime":"08:30:08","finishtime":"09:15:43","elapsedtime":"00:45:35"},{"competitor_name":"Charlie Ng","competitor_phone":"0123456791","event_type":"5 Km Run","entry_no":3,"starttime":"08:50:15","finishtime":"09:30:38","elapsedtime":"00:40:23"}]},
+
+{"_id":2,"carn_name":"RM Spring Series Clayton 2024","carn_date":"22-SEP-2024","team_name":"Wolves","team_leader":{"name":"Diana Lee","phone":"0123456792","email":"diana.lee@example.com"},"team_no_of_members":6,"team_members":[{"competitor_name":"Diana Lee","competitor_phone":"0123456792","event_type":"5 Km Run","entry_no":4,"starttime":"08:45:03","finishtime":"-","elapsedtime":"-"},{"competitor_name":"Fiona Goh","competitor_phone":"0123456794","event_type":"5 Km Run","entry_no":8,"starttime":"08:45:31","finishtime":"09:25:52","elapsedtime":"00:40:21"},{"competitor_name":"Ethan Wong","competit
+or_phone":"0123456793","event_type":"3 Km Community Run/Walk","entry_no":7,"starttime":"08:35:14","finishtime":"09:30:37","elapsedtime":"00:55:23"},{"competitor_name":"Fiona Goh","competitor_phone":"0123456794","event_type":"3 Km Community Run/Walk","entry_no":6,"starttime":"08:30:11","finishtime":"09:15:39","elapsedtime":"00:45:28"},{"competitor_name":"Ethan Wong","competitor_phone":"0123456793","event_type":"3 Km Community Run/Walk","entry_no":5,"starttime":"08:30:22","finishtime":"09:20:18","elapsedtime":"00:49:56"},{"competitor_name":"Ethan Wong","competitor_phone":"0123456793","event_type
+":"5 Km Run","entry_no":5,"starttime":"08:45:25","finishtime":"09:10:19","elapsedtime":"00:24:54"}]},
+
+{"_id":3,"carn_name":"RM Spring Series Caulfield 2024","carn_date":"05-OCT-2024","team_name":"Coyotes","team_leader":{"name":"Hannah Teo","phone":"0123456796","email":"hannah.teo@example.com"},"team_no_of_members":3,"team_members":[{"competitor_name":"Hannah Teo","competitor_phone":"0123456796","event_type":"10 Km Run","entry_no":4,"starttime":"08:35:00","finishtime":"09:15:17","elapsedtime":"00:40:17"},{"competitor_name":"Alice Tan","competitor_phone":"0123456789","event_type":"10 Km Run","entry_no":4,"starttime":"08:44:56","finishtime":"09:25:38","elapsedtime":"00:40:42"},{"competitor_name":
+"Julia Lim","competitor_phone":"0123456798","event_type":"10 Km Run","entry_no":1,"starttime":"08:30:00","finishtime":"09:00:45","elapsedtime":"00:30:45"}]},
+
+{"_id":4,"carn_name":"RM Spring Series Caulfield 2024","carn_date":"05-OCT-2024","team_name":"Falcons","team_leader":{"name":"Alice Tan","phone":"0123456789","email":"alice.tan@example.com"},"team_no_of_members":3,"team_members":[{"competitor_name":"Charlie Ng","competitor_phone":"0123456791","event_type":"21.1 Km Half Marathon","entry_no":1,"starttime":"08:00:00","finishtime":"08:30:17","elapsedtime":"00:30:17"},{"competitor_name":"Fiona Goh","competitor_phone":"0123456794","event_type":"21.1 Km Half Marathon","entry_no":4,"starttime":"08:15:07","finishtime":"08:54:58","elapsedtime":"00:39:51
+"},{"competitor_name":"Diana Lee","competitor_phone":"0123456792","event_type":"21.1 Km Half Marathon","entry_no":2,"starttime":"08:05:12","finishtime":"08:40:49","elapsedtime":"00:35:37"}]},
+
+{"_id":5,"carn_name":"RM Spring Series Caulfield 2024","carn_date":"05-OCT-2024","team_name":"Phoenix","team_leader":{"name":"Hannah Teo","phone":"0123456796","email":"hannah.teo@example.com"},"team_no_of_members":3,"team_members":[{"competitor_name":"Hannah Teo","competitor_phone":"0123456796","event_type":"21.1 Km Half Marathon","entry_no":1,"starttime":"08:00:00","finishtime":"08:30:16","elapsedtime":"00:30:16"},{"competitor_name":"Kevin Liu","competitor_phone":"0123456799","event_type":"21.1 Km Half Marathon","entry_no":4,"starttime":"08:15:06","finishtime":"08:54:59","elapsedtime":"00:39:
+53"},{"competitor_name":"Ivan Koh","competitor_phone":"0123456797","event_type":"21.1 Km Half Marathon","entry_no":2,"starttime":"08:05:14","finishtime":"08:40:35","elapsedtime":"00:35:21"}]},
+
+
+SQL> 
+SQL> --============================== END RUN ======================================---
+SQL> set echo off
