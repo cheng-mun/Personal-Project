@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Air Pollution Charts</title>
+  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
+</head>
+<body>
+  <h2>Average Air Pollution Index (API) in Malaysia</h2>
+  <div id="map_chart"></div>
+
+  <h2>Monthly Air Pollutant Concentrations (2017–2022)</h2>
+  <div id="line_chart"></div>
+
+  <script>
+    // Map chart spec
+    const mapChartSpec = {
+      "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+      "title": "Average Air Pollution Index(API) in Malaysia",
+      "width": 700,
+      "height": 400,
+      "projection": {"type": "equalEarth"},
+      "layer": [
+        {
+          "data": {
+            "url": "https://raw.githubusercontent.com/cheng-mun/FIT3179/main/File%20for%20map/malaysia_state.geojson",
+            "format": {"type": "json", "property": "features"}
+          },
+          "transform": [
+            {
+              "lookup": "properties.name",
+              "from": {
+                "data": {
+                  "url": "https://raw.githubusercontent.com/cheng-mun/FIT3179/main/File%20for%20map/avg_api_by_state.csv",
+                  "format": {"type": "csv"}
+                },
+                "key": "state",
+                "fields": ["avg_api"]
+              }
+            }
+          ],
+          "mark": {"type": "geoshape"},
+          "encoding": {
+            "color": {"field": "avg_api", "type": "quantitative", "title": "Average API"},
+            "tooltip": [
+              {"field": "properties.name", "type": "nominal", "title": "State"},
+              {"field": "avg_api", "type": "quantitative", "title": "Average API"}
+            ]
+          }
+        },
+        {
+          "data": {"graticule": {"extent": [[100,0.5],[120,7.5]], "step":[2,2]}},
+          "mark": {"type": "geoshape", "stroke": "lightgray", "strokeWidth": 0.5}
+        }
+      ]
+    };
+
+    // Line chart spec
+    const lineChartSpec = {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Normalized monthly air pollutant concentrations (2017–2022) with interactive filtering, tooltips, and annotation.",
+  "data": {
+    "url": "https://raw.githubusercontent.com/cheng-mun/Personal-Project/main/FIT3179%20Project%20Datasets/air_pollution.csv"
+  },
+  "transform": [
+    {"calculate": "toDate(datum.date)", "as": "parsed_date"},
+    {
+      "joinaggregate": [
+        {"op": "max", "field": "concentration", "as": "max_concentration"}
+      ],
+      "groupby": ["pollutant"]
+    },
+    {
+      "calculate": "datum.concentration / datum.max_concentration",
+      "as": "normalized_concentration"
+    }
+  ],
+  "params": [
+    {
+      "name": "pollutant_selection",
+      "value": "CO",
+      "bind": {
+        "input": "select",
+        "options": ["CO", "PM 2.5"],
+        "labels": ["CO", "PM 2.5"],
+        "name": "Select pollutant: "
+      }
+    }
+  ],
+  "width": 700,
+  "height": 400,
+  "title": "Monthly Air Pollutant Concentrations (2017–2022)",
+  "layer": [
+    {
+      "transform": [{"filter": "datum.pollutant == pollutant_selection"}],
+      "mark": {"type": "line", "point": true, "interpolate": "monotone"},
+      "encoding": {
+        "x": {"field": "parsed_date", "type": "temporal", "title": "Date"},
+        "y": {
+          "field": "normalized_concentration",
+          "type": "quantitative",
+          "title": "Concentration",
+          "axis": {"grid": false}
+        },
+        "color": {
+          "field": "pollutant",
+          "type": "nominal",
+          "title": "Pollutant"
+        },
+        "tooltip": [
+          {"field": "date", "title": "Date"},
+          {"field": "pollutant", "title": "Pollutant"},
+          {"field": "concentration", "title": "Original Concentration"},
+          {
+            "field": "normalized_concentration",
+            "title": "Normalized (0–1)",
+            "format": ".2f"
+          }
+        ]
+      }
+    },
+    {
+      "mark": {"type": "rule", "color": "red", "strokeDash": [4, 4]},
+      "encoding": {"x": {"datum": {"year": 2019, "date": 9}}}
+    },
+    {
+      "mark": {
+        "type": "text",
+        "align": "left",
+        "dx": 5,
+        "dy": -80,
+        "color": "red"
+      },
+      "encoding": {
+        "x": {"datum": ""},
+        "y": {"datum": 0.7},
+        "text": {"value": "1/9/2019: 2019 Southeast Asian haze"}
+      }
+    }
+  ],
+  "config": {}
+};
+
+    // Render charts
+    vegaEmbed('#map_chart', mapChartSpec);
+    vegaEmbed('#line_chart', lineChartSpec);
+  </script>
+</body>
+</html>
